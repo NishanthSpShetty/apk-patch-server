@@ -1,5 +1,17 @@
 package com.genesis.rest.repositories;
 
-public class ApplicationRepository {
+import org.springframework.data.repository.CrudRepository;
+
+import com.genesis.rest.repositories.model.Application;
+
+/**
+ * 
+ * @author nishanth
+ *
+ *         manage application table
+ */
+public interface ApplicationRepository extends CrudRepository<Application, Integer> {
+
+	Application findByName(String app);
 
 }

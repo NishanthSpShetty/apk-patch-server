@@ -5,19 +5,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-/**
- * 
- * @author nishanth
- *
- *
- *
- *         Application Table containing generic application information such as
- *         id, name and category <br>
- *         Can be extended to add more specification
- */
-
 @Entity
-public class Application {
+public class FileTable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -25,11 +14,8 @@ public class Application {
 
 	private String name;
 
-	private String category;
-
-	public Application(String name, String category) {
+	public FileTable(String name) {
 		this.name = name;
-		this.category = category;
 	}
 
 	public String getName() {
@@ -38,14 +24,6 @@ public class Application {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
 	}
 
 	public Integer getId() {

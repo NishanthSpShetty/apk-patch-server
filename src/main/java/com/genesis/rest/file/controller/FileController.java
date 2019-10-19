@@ -1,9 +1,8 @@
 package com.genesis.rest.file.controller;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -23,33 +22,85 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.genesis.rest.HelperUtils;
 import com.genesis.rest.file.UploadFileResponse;
 import com.genesis.rest.file.service.FileStorageService;
+import com.genesis.rest.file.service.SequenceService;
+import com.genesis.rest.repositories.ApkRepositories;
+import com.genesis.rest.repositories.AppPatchRepositories;
+import com.genesis.rest.repositories.ApplicationRepository;
+import com.genesis.rest.repositories.FileTableRepositories;
+import com.genesis.rest.repositories.model.Apk;
+import com.genesis.rest.repositories.model.Application;
+import com.genesis.rest.repositories.model.FileTable;
 
 @RestController
-@RequestMapping("/apk")
+@RequestMapping("rest/v1/apk")
 public class FileController {
 
 	private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 
 	@Autowired
+	private SequenceService sequenceService;
+
+	@Autowired
+	private AppPatchRepositories appPatchRepositories;
+
+	@Autowired
+	private ApplicationRepository applicationRepository;
+
+	@Autowired
+	private ApkRepositories apkRepositories;
+
+	@Autowired
 	private FileStorageService fileStorageService;
 
-	@PostMapping("/upload")
-	public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
+	@Autowired
+	private FileTableRepositories fileTableRepository;
 
-		String fileName = fileStorageService.storeFile(file);
+	@PostMapping("/app/{appName}/upload/file")
+	public Integer uploadFile(@PathVariable("appName") String appName, @RequestParam("file") MultipartFile file) {
+
+		String fileName = fileStorageService.storeFile(appName, sequenceService.getNextSequence(), file);
 
 		logger.info("Upload file request recieved , processing file " + file);
-		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download/")
-				.path(fileName).toUriString();
+		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download/").path(fileName)
+				.toUriString();
 
-		return new UploadFileResponse(fileName, fileDownloadUri, file.getContentType(), file.getSize());
+		logger.info("Download URI for file : " + fileDownloadUri);
+		FileTable fil = fileTableRepository.save(new FileTable(fileName));
+
+		return fil.getId();
+
 	}
 
-	@PostMapping("/uploadMultipleFiles")
-	public List<UploadFileResponse> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) {
-		return Arrays.asList(files).stream().map(file -> uploadFile(file)).collect(Collectors.toList());
+	@PostMapping("/app/{appName}/upload/meta/{id}")
+	public String uploadFile(@PathVariable("appName") String appName, @RequestParam("id") Integer fileId) {
+
+		// update the database
+		Application app = applicationRepository.findByName(appName);
+
+		UploadData data = new UploadData();
+
+		if (app == null) {
+			// create new application profile
+			app = new Application(appName, data.getCategory());
+			applicationRepository.save(app);
+		}
+
+		FileTable fil = fileTableRepository.findById(fileId).get();
+
+		// convert to Date object from the json str repr
+		Date toDate = HelperUtils.toUtilDate(data.getReleaseDate());
+
+		// create new Apk
+		Apk apk = new Apk(app, fil.getName(), toDate, data.getVersionDisplayName(), data.getVersionId());
+
+		apkRepositories.save(apk);
+
+		// we should trigger patch builder here
+
+		return "";
 	}
 
 	@GetMapping("/download/{fileName:.+}")

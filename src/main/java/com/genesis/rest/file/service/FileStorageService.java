@@ -24,6 +24,7 @@ import com.genesis.rest.file.exception.MyFileNotFoundException;
 public class FileStorageService {
 
 	private final Path fileStorageLocation;
+	private final Path patchfileStorageLocation;
 
 	private static final Logger logger = LoggerFactory.getLogger(FileStorageService.class);
 
@@ -32,17 +33,21 @@ public class FileStorageService {
 
 		logger.info("Initializing the file storage service...");
 
-		this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir()).toAbsolutePath().normalize();
+		this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadBaseDir()).toAbsolutePath().normalize();
+		this.patchfileStorageLocation = Paths.get(fileStorageProperties.getPatchBaseDir()).toAbsolutePath()
+				.normalize();
 
 		try {
 			Files.createDirectories(this.fileStorageLocation);
+			Files.createDirectories(this.patchfileStorageLocation);
+
 		} catch (Exception ex) {
 			throw new FileStorageException("Could not create the directory where the uploaded files will be stored.",
 					ex);
 		}
 	}
 
-	public String storeFile(MultipartFile file) {
+	public String storeFile(String appName, Long version, MultipartFile file) {
 		// Normalize file name
 		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
@@ -52,9 +57,16 @@ public class FileStorageService {
 				throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
 			}
 
+			// strip the extension to add version id
+			fileName = fileName.replace(".apk", "");
+			// we need to store the apk in particular app folders, but if the apk has same
+			// name we will be in trouble so we are adding version id
+			fileName = fileName + "_" + version + ".apk";
+			String fileNameWithAppBase = appName + "/" + fileName;
+
 			logger.info("Copying request stream to file storage ");
 			// Copy file to the target location (Replacing existing file with the same name)
-			Path targetLocation = this.fileStorageLocation.resolve(fileName);
+			Path targetLocation = this.fileStorageLocation.resolve(fileNameWithAppBase);
 			Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 			logger.debug("File copied to target storage location");
 			return fileName;
