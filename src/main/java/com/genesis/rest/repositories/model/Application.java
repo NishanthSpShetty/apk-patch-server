@@ -20,13 +20,15 @@ import javax.persistence.Id;
 public class Application {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
 	private String name;
 
 	private String category;
 
+	
+	public Application() {}
 	public Application(String name, String category) {
 		this.name = name;
 		this.category = category;

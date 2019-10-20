@@ -19,7 +19,7 @@ import com.genesis.rest.HelperUtils;
 public class Apk {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
 	// many versions of apk will map to one application
@@ -36,6 +36,8 @@ public class Apk {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date releaseDate;
 
+	public Apk() {}
+	
 	public Apk(Application app, String fileName, Date releaseDate, String versionDisplayName, Integer versionId) {
 		this.app = app;
 		this.apkFileName = fileName;

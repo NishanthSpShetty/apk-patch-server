@@ -1,4 +1,8 @@
 HELP.md
+.mvn
+
+uploads/
+patches/
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**

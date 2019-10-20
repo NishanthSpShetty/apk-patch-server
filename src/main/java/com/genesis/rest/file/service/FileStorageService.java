@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.genesis.rest.file.FileStorageProperties;
 import com.genesis.rest.file.exception.FileStorageException;
 import com.genesis.rest.file.exception.MyFileNotFoundException;
+import com.genesis.rest.repositories.model.AppPatch;
 
 @Service
 public class FileStorageService {
@@ -34,8 +35,7 @@ public class FileStorageService {
 		logger.info("Initializing the file storage service...");
 
 		this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadBaseDir()).toAbsolutePath().normalize();
-		this.patchfileStorageLocation = Paths.get(fileStorageProperties.getPatchBaseDir()).toAbsolutePath()
-				.normalize();
+		this.patchfileStorageLocation = Paths.get(fileStorageProperties.getPatchBaseDir()).toAbsolutePath().normalize();
 
 		try {
 			Files.createDirectories(this.fileStorageLocation);
@@ -57,6 +57,13 @@ public class FileStorageService {
 				throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
 			}
 
+			// setup target dir
+			Path targetDir = this.fileStorageLocation.resolve(appName);
+
+			if (!targetDir.toFile().exists()) {
+				Files.createDirectory(targetDir);
+			}
+
 			// strip the extension to add version id
 			fileName = fileName.replace(".apk", "");
 			// we need to store the apk in particular app folders, but if the apk has same
@@ -75,17 +82,17 @@ public class FileStorageService {
 		}
 	}
 
-	public Resource loadFileAsResource(String fileName) {
+	public Resource loadPatchFileAsResource(String appName, AppPatch patch) {
 		try {
-			Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+			Path filePath = this.patchfileStorageLocation.resolve(appName + "/" + patch.getPatchFileName()).normalize();
 			Resource resource = new UrlResource(filePath.toUri());
 			if (resource.exists()) {
 				return resource;
 			} else {
-				throw new MyFileNotFoundException("File not found " + fileName);
+				throw new MyFileNotFoundException("File not found " + filePath.toFile());
 			}
 		} catch (MalformedURLException ex) {
-			throw new MyFileNotFoundException("File not found " + fileName, ex);
+			throw new MyFileNotFoundException("File not found ", ex);
 		}
 	}
 }

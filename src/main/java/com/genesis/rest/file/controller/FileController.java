@@ -2,7 +2,6 @@ package com.genesis.rest.file.controller;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,14 +15,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.genesis.rest.DeltaGenerator;
 import com.genesis.rest.HelperUtils;
-import com.genesis.rest.file.UploadFileResponse;
 import com.genesis.rest.file.service.FileStorageService;
 import com.genesis.rest.file.service.SequenceService;
 import com.genesis.rest.repositories.ApkRepositories;
@@ -31,8 +31,10 @@ import com.genesis.rest.repositories.AppPatchRepositories;
 import com.genesis.rest.repositories.ApplicationRepository;
 import com.genesis.rest.repositories.FileTableRepositories;
 import com.genesis.rest.repositories.model.Apk;
+import com.genesis.rest.repositories.model.AppPatch;
 import com.genesis.rest.repositories.model.Application;
 import com.genesis.rest.repositories.model.FileTable;
+import com.genesis.rest.update.exceptions.AppNotFoundException;
 
 @RestController
 @RequestMapping("rest/v1/apk")
@@ -44,10 +46,9 @@ public class FileController {
 	private SequenceService sequenceService;
 
 	@Autowired
-	private AppPatchRepositories appPatchRepositories;
-
-	@Autowired
 	private ApplicationRepository applicationRepository;
+	@Autowired
+	private AppPatchRepositories appPatchRepositories;
 
 	@Autowired
 	private ApkRepositories apkRepositories;
@@ -75,12 +76,12 @@ public class FileController {
 	}
 
 	@PostMapping("/app/{appName}/upload/meta/{id}")
-	public String uploadFile(@PathVariable("appName") String appName, @RequestParam("id") Integer fileId) {
+	public String uploadFile(@PathVariable("appName") String appName, @PathVariable("id") Integer fileId,
+			@RequestBody UploadData data) {
 
+		logger.info("Received apk meta data update for " + appName + " -> " + fileId);
 		// update the database
 		Application app = applicationRepository.findByName(appName);
-
-		UploadData data = new UploadData();
 
 		if (app == null) {
 			// create new application profile
@@ -95,21 +96,41 @@ public class FileController {
 
 		// create new Apk
 		Apk apk = new Apk(app, fil.getName(), toDate, data.getVersionDisplayName(), data.getVersionId());
-
 		apkRepositories.save(apk);
+
+		try {
+			DeltaGenerator.triggerEvent(apk);
+		} catch (InterruptedException e) {
+
+			// need to handle this scenario carefully
+			// trigger again after sometime
+			e.printStackTrace();
+		}
 
 		// we should trigger patch builder here
 
-		return "";
+		return "{\"message\":\"ok\"}";
 	}
 
-	@GetMapping("/download/{fileName:.+}")
-	public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) {
+	@GetMapping("/app/{appName}/patch/{id:.+}")
+	public ResponseEntity<Resource> downloadFile(@PathVariable("appName") String appName,
+			@PathVariable("id") Integer patchId, HttpServletRequest request) throws AppNotFoundException {
 
-		logger.info("Download request recieved for file : " + fileName);
+		logger.info("Patch download request recieved for app : " + appName);
 
+		// get the appropriate ap[
+
+		Application app = applicationRepository.findByName(appName);
+
+		if (app == null) {
+			throw new AppNotFoundException("invalid app name");
+		}
+
+		// get the patch file name
+
+		AppPatch patch = appPatchRepositories.findById(patchId).get();
 		// Load file as Resource
-		Resource resource = fileStorageService.loadFileAsResource(fileName);
+		Resource resource = fileStorageService.loadPatchFileAsResource(appName, patch);
 
 		// Try to determine file's content type
 		String contentType = null;

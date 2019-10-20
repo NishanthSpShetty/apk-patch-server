@@ -8,17 +8,17 @@ import org.springframework.context.ConfigurableApplicationContext;
 import com.genesis.rest.file.FileStorageProperties;
 
 @SpringBootApplication
-@EnableConfigurationProperties({
-    FileStorageProperties.class
-})
+@EnableConfigurationProperties({ FileStorageProperties.class })
 public class GenesisApplicationMain {
 
 	public static void main(String[] args) {
-		ConfigurableApplicationContext cxt = SpringApplication.run(GenesisApplicationMain.class, args);
-	
-	
+		ConfigurableApplicationContext ctx = SpringApplication.run(GenesisApplicationMain.class, args);
+
+		// start the delta generation service
+		DeltaGenerator.init(ctx);
+		DeltaGenerator.run();
 		
-		
+
 	}
 
 }

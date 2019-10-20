@@ -12,6 +12,6 @@ import com.genesis.rest.repositories.model.Application;
  */
 public interface ApplicationRepository extends CrudRepository<Application, Integer> {
 
-	Application findByName(String app);
+	Application findByName(String name);
 
 }

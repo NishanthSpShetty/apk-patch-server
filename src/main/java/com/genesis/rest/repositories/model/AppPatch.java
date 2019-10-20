@@ -9,11 +9,21 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="app_patch")
+@Table(name = "app_patch")
 public class AppPatch {
 
+	public AppPatch() {
+	}
+
+	public AppPatch(Application app, Apk from, Apk to, String fileName) {
+		this.app = app;
+		this.fromApk = from;
+		this.toApk = to;
+		this.patchFileName = fileName;
+	}
+
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
 	@ManyToOne

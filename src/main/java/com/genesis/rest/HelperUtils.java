@@ -16,6 +16,8 @@ public class HelperUtils {
 
 	public static Date toUtilDate(String source) {
 		try {
+			if (source == null)
+				return new Date();
 			return jsonDateFormatter.parse(source);
 		} catch (ParseException e) {
 
