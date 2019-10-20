@@ -48,7 +48,7 @@ public class UpdateController {
 		}
 
 		// get the apk current version
-		Apk oldApk = apkRepositories.findByVersion(version);
+		Apk oldApk = apkRepositories.findByAppVersion(app.getId(), version);
 
 		if (oldApk == null) {
 			throw new AppNotFoundException("invalid version ");
@@ -57,6 +57,8 @@ public class UpdateController {
 		// we have the reference to app and apk,
 		// get the all versions ?
 //		List<Apk> latestApkList = apkRepositories.findAllLatestVersion(version);
+
+		logger.info("Searching for changes in app " + appName + " , version " + version + ", app id :" + app.getId());
 		Apk newApk = apkRepositories.findLatestVersion(app.getId(), version);
 
 		logger.info("We found new versions available for app " + app.getName() + ", Version :"

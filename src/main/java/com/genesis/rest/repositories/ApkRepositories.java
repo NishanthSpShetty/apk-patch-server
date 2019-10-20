@@ -9,7 +9,8 @@ import com.genesis.rest.repositories.model.Apk;
 
 public interface ApkRepositories extends CrudRepository<Apk, Integer> {
 
-	Apk findByVersion(Integer version);
+	@Query("select a from Apk a where a.app.id =?1 and a.version=?2")
+	Apk findByAppVersion(Integer appId, Integer version);
 
 	@Query("select a from Apk a where a.app.id =?1 and a.version >?2")
 	List<Apk> findAllLatestVersion( Integer appId, Integer version);

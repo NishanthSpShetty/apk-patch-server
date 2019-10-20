@@ -52,7 +52,7 @@ public class DeltaGenerationThread extends Thread {
 			dir.mkdir();
 		}
 
-		System.out.println("found " + list.size() + " old changes");
+		logger.info("found " + (list.size() - 1) + " old changes");
 
 		list.stream().filter(it -> it.getVersion() != apk.getVersion()).forEach(fromApk -> {
 			try {
@@ -92,7 +92,7 @@ public class DeltaGenerationThread extends Thread {
 
 		String fileName = appName + "_patch_v" + fromApk.getVersion() + "_to_v" + toApk.getVersion() + ".bin";
 
-		File patchFile = new File(DeltaGenerator.PATCHES_BASE_DIR+"/"+appName+"/", fileName);
+		File patchFile = new File(DeltaGenerator.PATCHES_BASE_DIR + "/" + appName + "/", fileName);
 
 		patchFile.createNewFile();
 

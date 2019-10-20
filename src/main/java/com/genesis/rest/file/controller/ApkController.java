@@ -1,7 +1,9 @@
 package com.genesis.rest.file.controller;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.genesis.rest.DeltaGenerator;
 import com.genesis.rest.HelperUtils;
@@ -38,9 +39,9 @@ import com.genesis.rest.update.exceptions.AppNotFoundException;
 
 @RestController
 @RequestMapping("rest/v1/apk")
-public class FileController {
+public class ApkController {
 
-	private static final Logger logger = LoggerFactory.getLogger(FileController.class);
+	private static final Logger logger = LoggerFactory.getLogger(ApkController.class);
 
 	@Autowired
 	private SequenceService sequenceService;
@@ -64,11 +65,8 @@ public class FileController {
 
 		String fileName = fileStorageService.storeFile(appName, sequenceService.getNextSequence(), file);
 
-		logger.info("Upload file request recieved , processing file " + file);
-		String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download/").path(fileName)
-				.toUriString();
+		logger.info("Upload file request recieved , processing file " + file + " for Application : " + appName);
 
-		logger.info("Download URI for file : " + fileDownloadUri);
 		FileTable fil = fileTableRepository.save(new FileTable(fileName));
 
 		return fil.getId();
@@ -112,6 +110,17 @@ public class FileController {
 		return "{\"message\":\"ok\"}";
 	}
 
+	class Apps {
+	}
+
+	@GetMapping("/apps")
+	public List<Apps> listAllApps() {
+
+		return Arrays.asList(new Apps());
+	}
+
+	
+	
 	@GetMapping("/app/{appName}/patch/{id:.+}")
 	public ResponseEntity<Resource> downloadFile(@PathVariable("appName") String appName,
 			@PathVariable("id") Integer patchId, HttpServletRequest request) throws AppNotFoundException {
