@@ -73,8 +73,9 @@ public class UpdateController {
 			throw new AppNotFoundException("patch is unavailable at the moment, try again");
 		}
 		logger.info("Found the new patch file for the update , sending data to client " + appPatch);
-		return ResponseEntity.ok().body(new UpdateResponse(app.getName(), newApk.getVersion(),
-				newApk.getVersionDisplayName(), newApk.getReleaseDate(), appPatch.getPatchFileName(), app.getId()));
+		return ResponseEntity.ok()
+				.body(new UpdateResponse(app.getName(), newApk.getVersion(), newApk.getVersionDisplayName(),
+						newApk.getReleaseDate(), appPatch.getPatchFileName(), appPatch.getId()));
 	}
 
 }

@@ -137,7 +137,7 @@ public class ApkController {
 
 		// get the patch file name
 
-		AppPatch patch = appPatchRepositories.findById(patchId).get();
+		AppPatch patch = appPatchRepositories.findById(patchId).orElseThrow(); 
 		// Load file as Resource
 		Resource resource = fileStorageService.loadPatchFileAsResource(appName, patch);
 

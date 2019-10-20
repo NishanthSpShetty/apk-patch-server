@@ -12,6 +12,15 @@ import javax.persistence.Table;
 @Table(name = "app_patch")
 public class AppPatch {
 
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 	public AppPatch() {
 	}
 
