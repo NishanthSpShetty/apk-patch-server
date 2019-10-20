@@ -44,7 +44,7 @@ public class DeltaGenerationThread extends Thread {
 
 		String appName = apk.getApp().getName();
 		// get the uploads path
-		String basePath = "uploads/" + appName;
+		String basePath = DeltaGenerator.PATCHES_BASE_DIR + "/" + appName;
 
 		File dir = new File(basePath);
 
@@ -71,7 +71,7 @@ public class DeltaGenerationThread extends Thread {
 		String appName = toApk.getApp().getName();
 		// get the uploads path
 		String basePath = "uploads/" + appName;
-
+		logger.info("generating delta between " + fromApk + " and " + toApk);
 		String oldApkFilePath = basePath + "/" + fromApk.getApkFileName();
 		String newApkFilePath = basePath + "/" + fromApk.getApkFileName();
 
@@ -92,7 +92,7 @@ public class DeltaGenerationThread extends Thread {
 
 		String fileName = appName + "_patch_v" + fromApk.getVersion() + "_to_v" + toApk.getVersion() + ".bin";
 
-		File patchFile = new File(DeltaGenerator.PATCHES_BASE_DIR, fileName);
+		File patchFile = new File(DeltaGenerator.PATCHES_BASE_DIR+"/"+appName+"/", fileName);
 
 		patchFile.createNewFile();
 
