@@ -30,6 +30,79 @@ This library has two components
 ---
 The server can be used as apk repo for the app which are not hosted in store or app which manages the its own update and upgrades.
 
+## Requirements
+    * Java 1.8 or above
+    * maven build tool
+    * database of your choice (RDBMS, application uses PostgreSQL)
+
+### Setup
+* application.properties 
+
+  provide the apk store(upload-base-dir) directory and patch store directory (patch-base-dir) in application.properties file.
+
+* PostgreSQL/Any of your choice but update the specific driver and connection urls in properties file
+
+    Application uses postgresql as database to store application meta data and file storage to store the apk files
+        1. create the database of your choice and update application.properties file.
+            create the following tables in database
+
+## Tables Schema
+
+
+### **file_table**
+  `contains infromation on uploaded files`
+
+| Column | Type | Nullable | Default |
+| ------ | ---- | -------- | ------- |
+| id| integer (serial)|    | 
+|name | character varying(50) | 
+
+### **application**
+`contains information on application`
+| Column | Type | Nullable | Default |
+| ------ | ---- | -------- | ------- |
+| id| integer (serial)|    | || 
+| name | character varying(50) |   No |  |
+| category | character varying(25) | No| |
+
+### **apk**
+`contains apk metadata of the application for all releases`
+| Column | Type | Nullable | Default |
+| ------ | ---- | -------- | ------- |
+| id| integer (serial)|    | 
+|app_id (references application[id])| integer|
+|version| integer| 
+|version_display_name | character varying(50)|
+|release_date         | timestamp without time zone |
+|apk_file_name        | character varying(50)       |
+
+### **app_patch**
+`apk patch/delta information of all apk versions`
+| Column | Type | Nullable | Default |
+| ------ | ---- | -------- | ------- |
+| id| integer (serial)|    | 
+|app_id          | integer|
+|from_apk_id [references apk(id)]| integer|
+|to_apk_id [references apk(id)]| integer|
+|patch_file_name | character varying(50) | 
+
+
+
+
+
+
+## To run
+```
+mvn install && java -jar target/genesis-server-0.0.1-SNAPSHOT.jar
+```
+
+NOTE : if you are using java 9 and above, the above command will throw ClassNotFoundException while looking for jaxb jars, as it is moved to J2EE, to run you can use the given jaxb jar with this project and run as follows
+```
+mvn clean install && java -cp jaxb-api-2.2.jar -jar target/genesis-server-0.0.1-SNAPSHOT.jar 
+```
+
+   go to your favorite browser and open `http://{host_ip}:8080/`. If you see repo screen, you are all set.
+
 
 ## endpoints
 * upload APK endpoints
@@ -124,3 +197,11 @@ The server can be used as apk repo for the app which are not hosted in store or 
 
 ## Patch application using bspatch
     server only contains the delta generation file, to use the application patcher refer another repo, a android application using the bspatch is found in repo ${COMING_SOON}
+
+
+
+
+---
+with the small changes to the  server or in uploading meta data, this can be used for any type of files, the server works on binary level.
+
+
