@@ -59,6 +59,7 @@ The server can be used as apk repo for the app which are not hosted in store or 
 
 ### **application**
 `contains information on application`
+
 | Column | Type | Nullable | Default |
 | ------ | ---- | -------- | ------- |
 | id| integer (serial)|    | || 
@@ -67,6 +68,7 @@ The server can be used as apk repo for the app which are not hosted in store or 
 
 ### **apk**
 `contains apk metadata of the application for all releases`
+
 | Column | Type | Nullable | Default |
 | ------ | ---- | -------- | ------- |
 | id| integer (serial)|    | 
@@ -78,6 +80,8 @@ The server can be used as apk repo for the app which are not hosted in store or 
 
 ### **app_patch**
 `apk patch/delta information of all apk versions`
+
+
 | Column | Type | Nullable | Default |
 | ------ | ---- | -------- | ------- |
 | id| integer (serial)|    | 
