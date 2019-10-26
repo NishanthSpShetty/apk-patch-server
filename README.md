@@ -52,43 +52,43 @@ The server can be used as apk repo for the app which are not hosted in store or 
 ### **file_table**
   `contains infromation on uploaded files`
 
-| Column | Type | Nullable | Default |
-| ------ | ---- | -------- | ------- |
-| id| integer (serial)|    | 
-|name | character varying(50) | 
+| Column | Type | Nullable |
+| ------ | ---- | -------- |
+| id| integer (serial)|  No| 
+|name | character varying(50) |No| 
 
 ### **application**
 `contains information on application`
 
-| Column | Type | Nullable | Default |
-| ------ | ---- | -------- | ------- |
-| id| integer (serial)|    | || 
+| Column | Type | Nullable |
+| ------ | ---- | -------- |
+| id| integer (serial)| No|
 | name | character varying(50) |   No |  |
 | category | character varying(25) | No| |
 
 ### **apk**
 `contains apk metadata of the application for all releases`
 
-| Column | Type | Nullable | Default |
-| ------ | ---- | -------- | ------- |
-| id| integer (serial)|    | 
-|app_id (references application[id])| integer|
-|version| integer| 
-|version_display_name | character varying(50)|
-|release_date         | timestamp without time zone |
-|apk_file_name        | character varying(50)       |
+| Column | Type | Nullable |
+| ------ | ---- | -------- | 
+| id| integer (serial)|No|    | 
+|app_id (references application[id])| integer|No|
+|version| integer| No|
+|version_display_name | character varying(50)|No|
+|release_date         | timestamp without time zone |No|
+|apk_file_name        | character varying(50)       |No|
 
 ### **app_patch**
 `apk patch/delta information of all apk versions`
 
 
-| Column | Type | Nullable | Default |
-| ------ | ---- | -------- | ------- |
-| id| integer (serial)|    | 
-|app_id          | integer|
-|from_apk_id [references apk(id)]| integer|
-|to_apk_id [references apk(id)]| integer|
-|patch_file_name | character varying(50) | 
+| Column | Type | Nullable |
+| ------ | ---- | -------- | 
+| id| integer (serial)|   No | 
+|app_id          | integer|No|
+|from_apk_id [references apk(id)]| integer|No|
+|to_apk_id [references apk(id)]| integer|No|
+|patch_file_name | character varying(50) |No|
 
 
 
@@ -100,7 +100,7 @@ The server can be used as apk repo for the app which are not hosted in store or 
 mvn install && java -jar target/genesis-server-0.0.1-SNAPSHOT.jar
 ```
 
-NOTE : if you are using java 9 and above, the above command will throw ClassNotFoundException while looking for jaxb jars, as it is moved to J2EE, to run you can use the given jaxb jar with this project and run as follows
+NoTE : if you are using java 9 and above, the above command will throw ClassNotFoundException while looking for jaxb jars, as it is moved to J2EE, to run you can use the given jaxb jar with this project and run as follows
 ```
 mvn clean install && java -cp jaxb-api-2.2.jar -jar target/genesis-server-0.0.1-SNAPSHOT.jar 
 ```
@@ -163,7 +163,7 @@ mvn clean install && java -cp jaxb-api-2.2.jar -jar target/genesis-server-0.0.1-
             {version}  current installed APK version 
 
     Request Body 
-            NONE
+            NoNE
 
     Response Body
             {
@@ -187,7 +187,7 @@ mvn clean install && java -cp jaxb-api-2.2.jar -jar target/genesis-server-0.0.1-
 
     
     Request Body 
-            NONE
+            NoNE
         
     Response
             patch file
@@ -195,7 +195,7 @@ mvn clean install && java -cp jaxb-api-2.2.jar -jar target/genesis-server-0.0.1-
 
 
 ----
-*NOTE : version is unique number generated for application, not a display string like 1.2.3*
+*NoTE : version is unique number generated for application, not a display string like 1.2.3*
 
 ----
 
