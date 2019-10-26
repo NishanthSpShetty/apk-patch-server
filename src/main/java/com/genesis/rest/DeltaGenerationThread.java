@@ -73,7 +73,7 @@ public class DeltaGenerationThread extends Thread {
 		String basePath = "uploads/" + appName;
 		logger.info("generating delta between " + fromApk + " and " + toApk);
 		String oldApkFilePath = basePath + "/" + fromApk.getApkFileName();
-		String newApkFilePath = basePath + "/" + fromApk.getApkFileName();
+		String newApkFilePath = basePath + "/" + toApk.getApkFileName();
 
 		File oldApkFile = new File(oldApkFilePath);
 		File newApkFile = new File(newApkFilePath);

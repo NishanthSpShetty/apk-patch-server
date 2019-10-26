@@ -61,6 +61,11 @@ public class UpdateController {
 		logger.info("Searching for changes in app " + appName + " , version " + version + ", app id :" + app.getId());
 		Apk newApk = apkRepositories.findLatestVersion(app.getId(), version);
 
+		if (newApk == null) {
+			logger.info("No updates available at the moment");
+			throw new AppNotFoundException("no updates available, try again");
+
+		}
 		logger.info("We found new versions available for app " + app.getName() + ", Version :"
 				+ newApk.getVersionDisplayName() + " [" + newApk.getVersion() + "]");
 
